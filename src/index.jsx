@@ -12,39 +12,49 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
   const Products = (props) => {
   //=========Display Products=============
-  const useFetch = (url) => {
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState([]);
+  //   const [error, setError] = useState(null);
+  //   const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          const res = await fetch(url);
-          const json = await res.json();
+const getProductsDB = {
+  method: 'get',
+  url: 'http://localhost:1337/products',
+  headers: { }
+};
 
-          setData(json);
-          setLoading(false);
-        } catch (error) {
-          setError(error);
-          setLoading(false);
-        }
-      }
-      fetchData()
-    }, [url]); 
-    console.log(data);
-    return { loading, error, data };
-  }; 
+useEffect(() => {
+  getRoute();
+}, [],
+);
 
-  const homeURL = 'http://localhost:1337/products';
-  useFetch(homeURL);
+
+
+  async function getRoute() {
+    try {
+      const response = await axios(getProductsDB);
+        setData(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  console.log(data);
+
   
-    const [items, setItems] = React.useState([{}]);
-    const [cart, setCart] = React.useState([{}]);
-    const [total, setTotal] = React.useState(0);
+  const listItems = data.map((product) => 
+  <Card key={product.id}>
+  Add Image for
+  {product.name} : $ {product.cost}
+  <Button onClick={()=>addToCart(product.id)}>
+  Add to cart
+  </Button>
+  </Card>
+  );
 
-    return (
+  function addToCart(moveToCartProductId) {
+    alert(`clicked ${moveToCartProductId}`);
+  }
+
+  return (
       <Container>
         <Row>
           <Col>
@@ -54,17 +64,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
         <Row>
           <Col>
             <h1>Product List</h1>
-            <ul style={ myStyle }>
-            {items.map((item) => (
-                  <li key={item}>
-                  <Button variant="primary" size="large">
-                  {item.name}:{item.cost}
-                  </Button>
-                  <input name={item.name} type="submit"></input>
-                  </li>
-            )
-              )}
-            </ul>
+            <ul>{listItems}</ul>
           </Col>
           <Col>
             <h1>Cart Contents</h1>
